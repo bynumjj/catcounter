@@ -5,7 +5,7 @@ Based on Udacity solution to CC Premium project.*/
 /* ======= Model ======= */
 
 var model = {
-    formVisible: true,  //toggle for showing or hiding admin form
+    formVisible: false,  //toggle for showing or hiding admin form
     currentCat: null,  // null is an object
     cats: [
         {
@@ -13,7 +13,6 @@ var model = {
             name: 'Tabby',
             imgSrc: 'img/cat1.jpg',
             imgAttribution: 'https://www.flickr.com/photos/bigtallguy/434164568',
-            location: 1  //identifies which cat is currentCat
         },
         {
             clickCount: 0,
@@ -80,17 +79,17 @@ var octopus = {
 
     //updates vars with new input from form fields after save is clicked
     updateVars: function() {
-        this.newName = document.getElementById('name');
-        this.newImgSrc = document.getElementById('imgSrc');
-        this.newClickCount = document.getElementById('clicks');
+        this.newName = document.getElementById('name').value;
+        this.newImgSrc = document.getElementById('imgSrc').value;
+        this.newClickCount = document.getElementById('clicks').value;
     },  // close update Vars
 
     // clears input fields after save is clicked
     resetVars: function() {
-        this.newName = '';
-        this.newImgSrc = '';
-        this.newClickCount = '';
-    }, // close resetVar
+        document.getElementById('name').value = '';
+        document.getElementById('imgSrc').value = '';
+        document.getElementById('clicks').value = '';
+        },  // close resetVar
 
     //assigns input values to currentCat properties after save is clicked
     addInput: function() {
@@ -103,27 +102,27 @@ var octopus = {
         if (this.newClickCount !== '') {
         model.currentCat.clickCount = this.newClickCount;
         }
+        catView.render();
+        catListView.render();
     },  // close addInput
-
-    //replaces cat in cats array with updated currentCat
-    replaceCat: function() {
-        model.cats[currentCat.location] = currentCat;
-    },
 
     //changes model.formVisible status to true when admin button is clicked
     showAdmin: function() {
         model.formVisible = true;
+        catView.toggleVisibility()
     }, // close showAdmin
 
     //changes model.formVisible status to false when save or cancel buttons are clicked
     hideAdmin: function() {
         model.formVisible = false;
+        catView.toggleVisibility();
     }, //close hideAdmin
 
     //returns model.formVisible status for use in toggle function
     visible: function() {
         return model.formVisible;
-    }  // close visible
+
+    }, // close visible()
 
 // end of my draft code
 
@@ -136,37 +135,30 @@ var catView = {
 // start of my draft code
 
     //adds functionality to buttons
-    initAdmin: function() {
+        initAdmin: function() {
 
-        octopus.setVars()  // calls octopus.setVars to set input vars as null
-
-        //Admin button: when clicked, shows admin field
+   //Admin button: when clicked, shows admin field
         this.adminBtn = document.getElementById('admin-btn');
         this.adminBtn.addEventListener('click', function() {
             octopus.showAdmin();  //sets model.formVisible to true
-            this.render();  //includes toggle function
         }); // end admin button
 
         //Save button: when clicked, hides admin form, updates model, clears fields
         this.saveBtn = document.getElementById('save-btn');
         this.saveBtn.addEventListener('click', function() {
             octopus.updateVars()  //assigns input data to input vars
-            //console.log(newName);  no result
             octopus.addInput();  // swaps input vars into model.currentCat
-            octopus.replaceCat(); // updates cats[] object with new input data
             octopus.hideAdmin();  //sets model.formVisible to false
-            this.render();  // renders page with updated info
             octopus.resetVars()  //resets input vars
         }); // end save button
-
-        //console.log(newName);  no result, with resetVars commented out
 
         // Cancel button: when clicked, hides admin form
         this.cancelBtn = document.getElementById('cancel-btn');
         this.cancelBtn.addEventListener('click', function() {
+            octopus.resetVars();
             octopus.hideAdmin();   // sets model.formVisibilty to false
-            this.render(); // renders page with updated info
-        }); // end cancel button
+        }); // end cancel buttoon
+
     },  //end of initAdmin bracket
 
     // shows or hides form field based on model.formVisible.  Called by catView.render
@@ -187,11 +179,7 @@ var catView = {
         this.catNameElem = document.getElementById('cat-name');
         this.catImageElem = document.getElementById('cat-img');
         this.countElem = document.getElementById('cat-count');
-        //my code stores pointers to input field values
-        this.formNameValue = document.getElementById('name').value;
-        this.formImageValue = document.getElementById('imgSrc').value;
-        this.formCountValue = document.getElementById('clicks').value;
-        // on click, increment currentCat.clickCounter
+        catView.initAdmin();
         this.catImageElem.addEventListener('click', function(){
             octopus.incrementCounter();
         });
@@ -203,14 +191,9 @@ var catView = {
     render: function() {
         // update the DOM elements with values from the currentCat
         var currentCat = octopus.getCurrentCat();
+        this.catImageElem.src = currentCat.imgSrc;
         this.countElem.textContent = "Clicks:  " + currentCat.clickCount;
         this.catNameElem.textContent = currentCat.name;
-        this.catImageElem.src = currentCat.imgSrc;
-        // my code - sets values of input fields to currentCat properties
-        this.formNameValue = currentCat.name;
-        this.formImageValue = currentCat.imgSrc;
-        this.formCountValue = currentCat.clickCount;
-
         this.toggleVisibility(); // shows or hides form field
     } // end catView.render
 };  // end catView
